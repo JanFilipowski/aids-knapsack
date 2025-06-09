@@ -106,8 +106,31 @@ def brute_force_knapsack(n, c, items):
     return lista_plecaka
 
 def dynamic_knapsack(n, c, items):
-    # xd
-    return brute_force_knapsack(n, c, items)
+    mpd = [[0]*(c+1) for _ in range(n+1)]
+    
+    #tworzenie macierzy progrmaowania dynamicznego
+    for i in range(1,n+1):
+        for j in range(1,c+1):
+            waga,wartosc = items[i-1]
+            if waga > j: 
+                mpd[i][j] = mpd[i-1][j]
+            else : 
+                mpd[i][j] = max(mpd[i-1][j],mpd[i-1][j - waga] + wartosc) 
+
+    #czytanie rozwiazania z macierzy
+    i,j=n,c
+    lista_plecaka=[]
+    print("wynik : ",mpd[n][c])
+    while i >= 0 and j >= 0:
+        print(mpd[i][j],i)
+        if mpd[i][j] == mpd[i-1][j]:
+            i-=1
+        else :
+            i -= 1
+            j -= items[i][0]
+            lista_plecaka.append([items[i][0],items[i][1],(items[i][1] / items[i][0]) if items[i][0] > 0 else float('inf'),i])
+    
+    return lista_plecaka
 
 def print_solution(name, lista_plecaka, c):
 
