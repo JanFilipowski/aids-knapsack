@@ -56,7 +56,7 @@ def read_from_file():
 
 def naive_knapsack(n, c, items):
     lista_elementow = [
-        [w, v, (v / w) if w > 0 else float('inf'), i]
+        [w, v, v / w, i]
         for i, (w, v) in enumerate(items)
     ]
     lista_elementow.sort(key=lambda x: x[2], reverse=True)
@@ -67,7 +67,7 @@ def naive_knapsack(n, c, items):
     while i < n and zajetosc_plecaka <= c:
         w, v, ratio, idx = lista_elementow[i]
         if zajetosc_plecaka + w <= c:
-            lista_plecaka.append([w, v, ratio, idx])
+            lista_plecaka.append([w, v, idx])
             zajetosc_plecaka += w
         i += 1
 
@@ -98,7 +98,6 @@ def brute_force_knapsack(n, c, items):
         [
             items[i][0],
             items[i][1],
-            (items[i][1] / items[i][0]) if items[i][0] > 0 else float('inf'),
             i
         ]
         for i in best_set
@@ -128,7 +127,7 @@ def dynamic_knapsack(n, c, items):
         else :
             i -= 1
             j -= items[i][0]
-            lista_plecaka.append([items[i][0],items[i][1],(items[i][1] / items[i][0]) if items[i][0] > 0 else float('inf'),i])
+            lista_plecaka.append([items[i][0],items[i][1],i])
     
     return lista_plecaka
 
@@ -139,7 +138,7 @@ def print_solution(name, lista_plecaka, c):
         print("Brak wybranych przedmiotów.")
         return
 
-    wagi, wartosci, ratios, indeksy = zip(*lista_plecaka)
+    wagi, wartosci, indeksy = zip(*lista_plecaka)
     total_w = sum(wagi)
     total_v = sum(wartosci)
 
@@ -163,12 +162,14 @@ def main():
 
     sol_g = naive_knapsack(n, c, items)
     print_solution("Algorytm zachłanny", sol_g, c)
-    _, wartosci_dp, _, _ = zip(*sol_dp) if sol_dp else ((), (), (), ())
-    v_dp = sum(wartosci_dp)
-    _, wartosci_g, _, _ = zip(*sol_g) if sol_g else ((), (), (), ())
-    v_g = sum(wartosci_g)
-    print("Rozwiązanie zachłanne jest", "optymalne." if v_g == v_dp else "nieoptymalne.")
-
+    try:
+        _, wartosci_dp, _ = zip(*sol_dp) if sol_dp else ((), (), (), ())
+        v_dp = sum(wartosci_dp)
+        _, wartosci_g, _ = zip(*sol_g) if sol_g else ((), (), (), ())
+        v_g = sum(wartosci_g)
+        print("Rozwiązanie zachłanne jest", "optymalne." if v_g == v_dp else "nieoptymalne.")
+    except ValueError:
+        print("Nie udało się znaleźć rozwiązania dla podanej pojemności")
     sol_bf = brute_force_knapsack(n, c, items)
     print_solution("Przegląd zupełny (brute-force)", sol_bf, c)
 
